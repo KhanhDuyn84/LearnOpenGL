@@ -1,7 +1,9 @@
 #include "MainWindow.h"
+#include "SOIL2.h"
 #include "GLSLShader.h"
 #include <iostream>
 #include "define.h"
+#include "Loader.h"
 
 void MainWindow::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -80,29 +82,20 @@ void MainWindow::Run()
 {
 	float vertices[] = {
 		//Position					//Color
-		-0.5f, -0.5f, 0.0f,			1.0f, 0.0f, 0.0f,
-		0.5f, -0.5f, 0.0f,			0.0f, 1.0f, 0.0f,
-		0.0f, 0.5f, 0.0f,			0.0f, 0.0f, 1.0f
+		-0.5f, -0.5f, 0.0f,			0.0f, 0.0f,
+		0.5f, -0.5f, 0.0f,			1.0f, 0.0f,
+		0.0f, 0.5f, 0.0f,			0.0f, 1.0f
 	};
 	
-	GLuint VAO, VBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	GLuint indices[] = {
+		0,1,2
+	};
+	
+	std::unique_ptr<RawModel> rawModel = Loader::LoadModel(vertices, sizeof(vertices) / sizeof(vertices[0]), indices, sizeof(indices) / sizeof(indices[0]));
 
 	std::unique_ptr<GLSLShader> triangleShader = std::make_unique<GLSLShader>("../Resources/Shaders/TriangleShaderVS.vs","../Resources/Shaders/TriangleShaderFS.fs");
+
+	std::unique_ptr<RawTexture> rawTexture = Loader::LoadTexture("../Resources/images/wall.jpg", 0);
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
@@ -119,8 +112,12 @@ void MainWindow::Run()
 		ProcessInput();
 		
 		triangleShader->Use();
-		glBindVertexArray(VAO);
+		glActiveTexture(GL_TEXTURE0 + rawTexture->getTextureUnit());
+		glBindTexture(GL_TEXTURE_2D, rawTexture->getTextureID());
+		glBindVertexArray(rawModel->getVAOID());
 		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindVertexArray(0);
 
 		glfwSwapBuffers(m_MainWindow);
 		glfwPollEvents();
