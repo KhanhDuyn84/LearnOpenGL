@@ -118,6 +118,11 @@ void GLSLShader::CheckCompileErrors(unsigned int shader, std::string type)
 	}
 }
 
+void GLSLShader::UniformErrorPrintLog(const std::string& name) const
+{
+	std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+}
+
 void GLSLShader::setBool(const std::string &name, bool value) const
 {
 	if (isUniformExist(name))
@@ -126,7 +131,7 @@ void GLSLShader::setBool(const std::string &name, bool value) const
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -138,7 +143,7 @@ void GLSLShader::setInt(const std::string &name, int value) const
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -150,7 +155,7 @@ void GLSLShader::setFloat(const std::string &name, float value) const
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -162,7 +167,7 @@ void GLSLShader::setVec2(const std::string &name, const glm::vec2 &value) const
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -174,7 +179,7 @@ void GLSLShader::setVec2(const std::string &name, float x, float y) const
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -186,7 +191,7 @@ void GLSLShader::setVec3(const std::string &name, const glm::vec3 &value) const
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -198,7 +203,7 @@ void GLSLShader::setVec3(const std::string &name, float x, float y, float z) con
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -210,7 +215,7 @@ void GLSLShader::setVec4(const std::string &name, const glm::vec4 &value) const
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -222,7 +227,7 @@ void GLSLShader::setVec4(const std::string &name, float x, float y, float z, flo
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -234,7 +239,7 @@ void GLSLShader::setMat2(const std::string &name, const glm::mat2 &mat) const
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -246,7 +251,7 @@ void GLSLShader::setMat3(const std::string &name, const glm::mat3 &mat) const
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }
 
@@ -258,6 +263,6 @@ void GLSLShader::setMat4(const std::string &name, const glm::mat4 &mat) const
 	}
 	else
 	{
-		std::cout << "UNIFORM " << name << " does not exist" << std::endl;
+		UniformErrorPrintLog(name);
 	}
 }

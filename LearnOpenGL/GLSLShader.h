@@ -10,13 +10,12 @@ class GLSLShader : public Noncopyable
 {
 private:
 	GLuint m_ID;
-
 	std::map<std::string, int> m_Uniforms;
 
 	void CheckCompileErrors(unsigned int shader, std::string type);
 	void CompileShader(std::string VertexCode, std::string FragmentCode);
-
 	bool isUniformExist(const std::string &uniformName) const;
+	void UniformErrorPrintLog(const std::string& name) const;
 public:
 	void Use();
 
@@ -37,6 +36,5 @@ public:
 	void setMat2(const std::string &name, const glm::mat2 &mat) const;
 	void setMat3(const std::string &name, const glm::mat3 &mat) const;
 	void setMat4(const std::string &name, const glm::mat4 &mat) const;
-
 };
 

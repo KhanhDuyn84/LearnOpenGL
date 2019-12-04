@@ -35,7 +35,7 @@ std::unique_ptr<RawTexture> Loader::LoadTexture(std::string fileName, GLuint Tex
 	return rawTexture;
 }
 
-std::unique_ptr<RawModel> Loader::LoadModel(float *vertices, GLuint vertexCount, GLuint *indices, GLuint indexCount)
+std::unique_ptr<RawModel> Loader::LoadRawModelWithIndices(float *vertices, GLuint vertexCount, GLuint *indices, GLuint indexCount)
 {
 	GLuint VAO, VBO, EBO;
 	glGenVertexArrays(1, &VAO);
@@ -59,7 +59,7 @@ std::unique_ptr<RawModel> Loader::LoadModel(float *vertices, GLuint vertexCount,
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	std::unique_ptr<RawModel> rawModel = std::make_unique<RawModel>(VAO, VBO, EBO, indexCount);
+	std::unique_ptr<RawModel> rawModel = std::make_unique<RawModel>(VAO, VBO, EBO, vertexCount);
 
 	return std::move(rawModel);
 }

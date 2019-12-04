@@ -77,6 +77,9 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -84,7 +87,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\ExternalLib\SOIL2\SpartanJ_SOIL2\src\SOIL2;$(SolutionDir)\ExternalLib\GLAD\include;$(SolutionDir)\ExternalLib\GLFW\glfw-3.3\include;$(SolutionDir)\ExternalLib\GLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -98,6 +105,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -108,14 +116,48 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\ExternalLib\SOIL2\SpartanJ_SOIL2\src\SOIL2;$(SolutionDir)\ExternalLib\GLAD\include;$(SolutionDir)\ExternalLib\GLFW\glfw-3.3\include;$(SolutionDir)\ExternalLib\GLM;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\ExternalLib\GLAD\src\glad.c" />
+    <ClCompile Include="GLSLShader.cpp" />
+    <ClCompile Include="Loader.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExternalLib\GLFW\build\src\glfw.vcxproj">
+      <Project>{2f63f72f-a668-3324-9d30-d316633b0918}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ExternalLib\SOIL2\SpartanJ_SOIL2\make\windows\soil2-static-lib.vcxproj">
+      <Project>{1a298d1d-5a9b-7244-81a1-24b78f89ff00}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="define.h" />
+    <ClInclude Include="FpsClass.h" />
+    <ClInclude Include="GLSLShader.h" />
+    <ClInclude Include="Loader.h" />
+    <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="MatrixHelper.h" />
+    <ClInclude Include="Noncopyable.h" />
+    <ClInclude Include="RawModel.h" />
+    <ClInclude Include="RawTexture.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\Resources\Images\awesomeface.png" />
+    <Image Include="..\Resources\Images\container.jpg" />
+    <Image Include="..\Resources\Images\wall.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Resources\Shaders\TriangleShaderFS.fs" />
+    <None Include="..\Resources\Shaders\TriangleShaderVS.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

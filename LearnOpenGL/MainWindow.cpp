@@ -4,7 +4,8 @@
 #include <iostream>
 #include "define.h"
 #include "Loader.h"
-
+#include "FpsClass.h"
+#include "MatrixHelper.h"
 void MainWindow::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
@@ -81,41 +82,89 @@ void MainWindow::ProcessInput()
 void MainWindow::Run()
 {
 	float vertices[] = {
-		//Position					//Color
-		-0.5f, -0.5f, 0.0f,			0.0f, 0.0f,
-		0.5f, -0.5f, 0.0f,			1.0f, 0.0f,
-		0.0f, 0.5f, 0.0f,			0.0f, 1.0f
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
 	
 	GLuint indices[] = {
 		0,1,2
 	};
 	
-	std::unique_ptr<RawModel> rawModel = Loader::LoadModel(vertices, sizeof(vertices) / sizeof(vertices[0]), indices, sizeof(indices) / sizeof(indices[0]));
+	std::unique_ptr<RawModel> rawModel = Loader::LoadRawModelWithIndices(vertices, sizeof(vertices) / sizeof(vertices[0]), indices, sizeof(indices) / sizeof(indices[0]));
 
-	std::unique_ptr<GLSLShader> triangleShader = std::make_unique<GLSLShader>("../Resources/Shaders/TriangleShaderVS.vs","../Resources/Shaders/TriangleShaderFS.fs");
+	std::unique_ptr<RawTexture> rawTexture = Loader::LoadTexture("../Resources/images/container.jpg", 0);
 
-	std::unique_ptr<RawTexture> rawTexture = Loader::LoadTexture("../Resources/images/wall.jpg", 0);
+	std::unique_ptr<GLSLShader> triangleShader = std::make_unique<GLSLShader>("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
+	triangleShader->AddUniform("MVP");
 
-	float deltaTime = 0.0f;
-	float lastFrame = 0.0f;
-	float currentFrame = 0.0f;
+
+	glm::mat4 model = glm::mat4(1.0f);
+	
+	glm::mat4 view = glm::mat4(1.0f);
+	glm::mat4 projection = glm::mat4(1.0f);
+	glm::mat4 MVP = glm::mat4(1.0f);
+	
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	projection = glm::perspective(glm::radians(45.0f),(float) SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
+	
+	FpsClass fps;
+	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(m_MainWindow))
 	{
-		currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-		std::cout << "Delta Time: " << deltaTime << "\tFPS: " << (float)1.0f / deltaTime << std::endl;
+		fps.DoFrame();
+		ProcessInput();
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		ProcessInput();
-		
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		model = MatrixHelper::CreateTransformationMatrix(glm::vec3(1.0f, 0.0f, -3.0f), 0.0f, (float)glfwGetTime()*50.0f, 0.0f, 1.0f);
+		MVP = projection * view * model;
 		triangleShader->Use();
+		triangleShader->setMat4("MVP", MVP);
+
 		glActiveTexture(GL_TEXTURE0 + rawTexture->getTextureUnit());
 		glBindTexture(GL_TEXTURE_2D, rawTexture->getTextureID());
 		glBindVertexArray(rawModel->getVAOID());
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawArrays(GL_TRIANGLES, 0, rawModel->getVertexCount());
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindVertexArray(0);
 
