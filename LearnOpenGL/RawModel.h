@@ -5,16 +5,12 @@ class RawModel : public Noncopyable
 {
 private:
 	GLuint m_VAOID;
-	GLuint m_VBOID;
-	GLuint m_EBOID;
 	GLuint m_VertexCount;
 public:
 	
-	RawModel(GLuint VAOID, GLuint VBOID, GLuint EBOID, GLuint VertexCount)
+	RawModel(GLuint VAOID, GLuint VertexCount)
 	{
 		m_VAOID = VAOID;
-		m_VBOID = VBOID;
-		m_EBOID = EBOID;
 		m_VertexCount = VertexCount;
 	}
 
@@ -30,9 +26,6 @@ public:
 
 	~RawModel()
 	{
-		glDeleteVertexArrays(1, &m_VAOID);
-		glDeleteBuffers(1, &m_VBOID);
-		glDeleteBuffers(1, &m_EBOID);
 		m_VertexCount = 0;
 	}
 };

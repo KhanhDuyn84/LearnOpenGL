@@ -1,6 +1,7 @@
 #include <iostream>
 #include <memory>
 #include "MainWindow.h"
+#include <map>
 int main()
 {
 	{
