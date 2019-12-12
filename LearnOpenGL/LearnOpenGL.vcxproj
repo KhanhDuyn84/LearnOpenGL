@@ -135,6 +135,7 @@
     <ClCompile Include="Loader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ExternalLib\GLFW\build\src\glfw.vcxproj">
@@ -155,6 +156,7 @@
     <ClInclude Include="Noncopyable.h" />
     <ClInclude Include="RawModel.h" />
     <ClInclude Include="RawTexture.h" />
+    <ClInclude Include="Renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Resources\Images\awesomeface.png" />
@@ -162,8 +164,10 @@
     <Image Include="..\Resources\Images\wall.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Resources\Shaders\TriangleShaderFS.fs" />
-    <None Include="..\Resources\Shaders\TriangleShaderVS.vs" />
+    <None Include="..\Resources\Shaders\ContainerShaderFS.fs" />
+    <None Include="..\Resources\Shaders\ContainerShaderVS.vs" />
+    <None Include="..\Resources\Shaders\LampShaderFS.fs" />
+    <None Include="..\Resources\Shaders\LampShaderVS.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

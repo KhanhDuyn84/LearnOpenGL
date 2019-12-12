@@ -6,6 +6,7 @@
 #include "Loader.h"
 #include "FpsClass.h"
 #include "MatrixHelper.h"
+#include "Renderer.h"
 
 bool MainWindow::firstMouse = true;
 float MainWindow::lastX = SCR_WIDTH / 2;
@@ -41,7 +42,7 @@ void MainWindow::mouse_callback(GLFWwindow *window, double xpos, double ypos)
 	}
 }
 
-void MainWindow::scroll_callback(GLFWwindow *window, double xoffset,double yoffset)
+void MainWindow::scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
 	m_Camera->InputScroll(yoffset);
 }
@@ -65,7 +66,7 @@ MainWindow::MainWindow()
 
 	SetUpCallBackFunc();
 
-	m_Camera = std::make_unique<Camera>(glm::vec3(0.0f,0.0f,3.0f), glm::vec3(0.0f,0.0f,-1.0f), glm::vec3(0.0f,1.0f,0.0f));
+	m_Camera = std::make_unique<Camera>(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 MainWindow::~MainWindow()
@@ -119,7 +120,7 @@ void MainWindow::ProcessInput(float deltaTime)
 	}
 	if (glfwGetKey(m_MainWindow, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		m_Camera->InputKeyBoard(Camera_Movement::FORWARD,deltaTime);
+		m_Camera->InputKeyBoard(Camera_Movement::FORWARD, deltaTime);
 	}
 	if (glfwGetKey(m_MainWindow, GLFW_KEY_S) == GLFW_PRESS)
 	{
@@ -138,101 +139,140 @@ void MainWindow::ProcessInput(float deltaTime)
 void MainWindow::Run()
 {
 	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		// positions          // normals           // texture coords
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 	};
-	
-	std::unique_ptr<RawModel> rawModel = Loader::LoadRawModelWithVertices(vertices, sizeof(vertices) / sizeof(vertices[0]));
-	//std::unique_ptr<RawModel> rawModel = Loader::LoadObjModel("../Resources/images/cube.obj");
-	std::unique_ptr<RawTexture> rawTexture = Loader::LoadTexture("../Resources/images/container.jpg", 0);
 
-	std::unique_ptr<GLSLShader> triangleShader = std::make_unique<GLSLShader>("../Resources/Shaders/TriangleShaderVS.vs", "../Resources/Shaders/TriangleShaderFS.fs");
-	triangleShader->AddUniform("MVP");
-	
-	    glm::vec3 cubePositions[] = {
-        glm::vec3( 0.0f,  0.0f,  0.0f),
-        glm::vec3( 2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3 (2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3( 1.3f, -2.0f, -2.5f),
-        glm::vec3( 1.5f,  2.0f, -2.5f),
-        glm::vec3( 1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-	 };
+	std::shared_ptr<RawModel> containerModel = Loader::LoadRawModelWithVertices(vertices, sizeof(vertices) / sizeof(vertices[0]));
+	std::shared_ptr<RawTexture> containerTexture1 = Loader::LoadTexture("../Resources/images/container2.png", 0);
+	std::shared_ptr<RawTexture> containerTexture2 = Loader::LoadTexture("../Resources/images/container2_specular.png", 1);
+	std::shared_ptr<RawTexture> containerTexture3 = Loader::LoadTexture("../Resources/images/matrix.jpg", 2);
+	std::vector<std::shared_ptr<RawTexture>> containerTextures;
+	containerTextures.push_back(containerTexture1);
+	containerTextures.push_back(containerTexture2);
+	containerTextures.push_back(containerTexture3);
+	std::unique_ptr<GLSLShader> containerShader = std::make_unique<GLSLShader>("../Resources/Shaders/ContainerShaderVS.vs", "../Resources/Shaders/ContainerShaderFS.fs");
+	containerShader->AddUniform("MVP");
+	containerShader->AddUniform("model");
+	containerShader->AddUniform("light.position");
+	containerShader->AddUniform("light.ambient");
+	containerShader->AddUniform("light.diffuse");
+	containerShader->AddUniform("light.specular");
+	containerShader->AddUniform("material.diffuse");
+	containerShader->AddUniform("material.specular");
+	containerShader->AddUniform("material.emission");
+	containerShader->AddUniform("material.shininess");
+	containerShader->AddUniform("viewPos");
+
+	std::shared_ptr<RawModel> lampModel = Loader::LoadRawModelWithVertices(vertices, sizeof(vertices) / sizeof(vertices[0]));
+	std::vector<std::shared_ptr<RawTexture>> lampTextures;
+	std::unique_ptr<GLSLShader> lampShader = std::make_unique<GLSLShader>("../Resources/Shaders/LampShaderVS.vs", "../Resources/Shaders/LampShaderFS.fs");
+	lampShader->AddUniform("MVP");
+	lampShader->AddUniform("lightColor");
+
+	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 lightPos = glm::vec3(1.2f, 0.5f, 2.0f);	
+	glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);
+
+	containerShader->Use();
+	containerShader->setVec3("light.position", lightPos);
+	containerShader->setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+	containerShader->setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+	containerShader->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+	containerShader->setInt("material.diffuse", containerTexture1->getTextureUnit());
+	containerShader->setInt("material.specular", containerTexture2->getTextureUnit());
+	containerShader->setInt("material.emission", containerTexture3->getTextureUnit());
+	containerShader->setFloat("material.shininess",32);
+
+
+	lampShader->Use();
+	lampShader->setVec3("lightColor",lightColor);
+
+
 	FpsClass fps;
 	glEnable(GL_DEPTH_TEST);
 	while (!glfwWindowShouldClose(m_MainWindow))
 	{
 		fps.DoFrame();
-		std::cout << fps.getFPS() << std::endl;
 		ProcessInput(fps.getDeltaTime());
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		lightPos.x = sin(glfwGetTime())*2.0f;
+		lightPos.z = cos(glfwGetTime())*2.0f;
+
+		//lightColor.x = sin(glfwGetTime() * 2.0f);
+		//lightColor.y = sin(glfwGetTime() * 0.7f);
+		//lightColor.z = sin(glfwGetTime() * 1.3f);
+		glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f); // decrease the influence
+		glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // low influence
+
 		glm::mat4 view = MatrixHelper::CreateViewMatrix(m_Camera);
 		glm::mat4 projection = MatrixHelper::CreateProjectionMatrix(m_Camera);
 
-		glActiveTexture(GL_TEXTURE0 + rawTexture->getTextureUnit());
-		glBindTexture(GL_TEXTURE_2D, rawTexture->getTextureID());
-		glBindVertexArray(rawModel->getVAOID());
-		for (unsigned int i = 0; i < 10; i++)
-		{
-			// calculate the model matrix for each object and pass it to shader before drawing
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			glm::mat4 MVP = projection * view * model;
-			triangleShader->Use();
-			triangleShader->setMat4("MVP", MVP);
-			glDrawArrays(GL_TRIANGLES, 0, rawModel->getVertexCount());
-			//glDrawElements(GL_TRIANGLES, rawModel->getVertexCount(), GL_UNSIGNED_INT, 0);
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 MVP = projection * view * model;
+		containerShader->Use();
+		containerShader->setMat4("MVP", MVP);
+		containerShader->setMat4("model", model);
+		containerShader->setVec3("viewPos", m_Camera->getPosition());
+		containerShader->setVec3("light.position", lightPos);
+		containerShader->setVec3("light.ambient", ambientColor);
+		containerShader->setVec3("light.diffuse", diffuseColor);
+		Renderer::DrawArrays(containerModel, containerTextures);
 
-		}
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glBindVertexArray(0);
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, lightPos);
+		model = glm::scale(model, glm::vec3(0.2f,0.2f,0.2f));
+		MVP = projection * view * model;
+		lampShader->Use();
+		lampShader->setMat4("MVP", MVP);
+		lampShader->setVec3("lightColor", lightColor);
+		Renderer::DrawArrays(lampModel, lampTextures);
+
 		glfwSwapBuffers(m_MainWindow);
 		glfwPollEvents();
 	}

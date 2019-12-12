@@ -39,7 +39,7 @@ float Camera::getFov()const
 
 void Camera::InputKeyBoard(Camera_Movement movement, float deltaTime)
 {
-	float cameraSpeed = 10.0f * deltaTime;
+	float cameraSpeed = 5.0f * deltaTime;
 	if (movement == Camera_Movement::FORWARD)
 	{
 		m_CameraPos += cameraSpeed * glm::normalize(m_CameraTarget);
@@ -60,7 +60,7 @@ void Camera::InputKeyBoard(Camera_Movement movement, float deltaTime)
 
 void Camera::InputMouse(float xoffset, float yoffset)
 {
-	float sensitive = 0.3f;
+	float sensitive = 0.1f;
 	xoffset *= sensitive;
 	yoffset *= sensitive;
 	m_yaw += xoffset;
